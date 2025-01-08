@@ -23,13 +23,13 @@ class ModernApp(ctk.CTk):
         self.ip_label.grid(row=0, column=0, padx=10, pady=5)
         self.ip_entry = ctk.CTkEntry(tcp_frame, corner_radius=10)
         self.ip_entry.grid(row=0, column=1, padx=10, pady=5)
-        self.ip_entry.insert(0, "localhost")
+        self.ip_entry.insert(0, "192.168.0.133")
 
         self.port_label = ctk.CTkLabel(tcp_frame, text="Port:")
         self.port_label.grid(row=0, column=2, padx=10, pady=5)
         self.port_entry = ctk.CTkEntry(tcp_frame, corner_radius=10)
         self.port_entry.grid(row=0, column=3, padx=10, pady=5)
-        self.port_entry.insert(0, "12345")
+        self.port_entry.insert(0, "1234")
 
         self.connect_btn = ctk.CTkButton(tcp_frame, text="Connect", corner_radius=10, hover_color="#357ABD", command=self.connect)
         self.connect_btn.grid(row=0, column=4, padx=10, pady=5)
@@ -56,76 +56,29 @@ class ModernApp(ctk.CTk):
         self.send_btn = ctk.CTkButton(control_frame, text="Send", corner_radius=10, hover_color="#357ABD", command=self.send_command)
         self.send_btn.grid(row=2, column=2, padx=10, pady=5)
 
-        # Data Recording Frame
-        data_frame = ctk.CTkFrame(self.gradient_frame, corner_radius=15)
-        data_frame.grid(row=2, column=0, padx=20, pady=10, sticky="ew")
-
-        self.topic_label = ctk.CTkLabel(data_frame, text="Topic Name:")
-        self.topic_label.grid(row=0, column=0, padx=10, pady=5)
-
-        self.topic_entry = ctk.CTkEntry(data_frame, corner_radius=10)
-        self.topic_entry.grid(row=0, column=1, padx=10, pady=5)
-
-        self.topic_entry1 = ctk.CTkEntry(data_frame, corner_radius=10)
-        self.topic_entry1.grid(row=1, column=1, padx=10, pady=5)
-
-        self.file_label = ctk.CTkLabel(data_frame, text="File Name:")
-        self.file_label.grid(row=0, column=2, padx=10, pady=5)
-        self.file_entry = ctk.CTkEntry(data_frame, corner_radius=10)
-        self.file_entry.grid(row=0, column=3, padx=10, pady=5)
-
-        # Toggle button for start/stop recording
-        self.is_recording = False
-        self.start_recording_btn = ctk.CTkButton(data_frame, text="Start", corner_radius=10, hover_color="#357ABD", command=self.toggle_recording)
-        self.start_recording_btn.grid(row=0, column=4, padx=10, pady=5)
-
-        # Main container frame for Motor State and Buttons
-        main_container_frame = ctk.CTkFrame(self.gradient_frame, corner_radius=15)
-        main_container_frame.grid(row=3, column=0, padx=20, pady=10, sticky="ew")
-        main_container_frame.grid_columnconfigure(0, weight=1)
-        main_container_frame.grid_columnconfigure(1, weight=1)
-        
-        # Motor Toggle Frame (Left Side)
-        motor_frame = ctk.CTkFrame(main_container_frame, corner_radius=15)
-        motor_frame.grid(row=0, column=0, padx=(10, 10), pady=10, sticky="w")
+        # Motor Toggle Frame
+        motor_frame = ctk.CTkFrame(self.gradient_frame, corner_radius=15)
+        motor_frame.grid(row=3, column=0, padx=20, pady=10, sticky="ew")
 
         motor_label = ctk.CTkLabel(motor_frame, text="Motor State", font=("Arial", 14, "bold"))
-        motor_label.grid(row=0, column=0, padx=10, pady=5, sticky="w")
+        motor_label.grid(row=0, column=0, padx=10, pady=5)
 
         self.motor_state_switch = ctk.CTkSwitch(motor_frame, text=" ", onvalue="CLOSED LOOP", offvalue="IDLE", command=self.toggle_motor_state)
-        self.motor_state_switch.grid(row=1, column=0, padx=20, pady=5, sticky="w")
+        self.motor_state_switch.grid(row=1, column=1, padx=20, pady=5)
         self.motor_state_switch.deselect()  # Set default state to "IDLE"
 
-        # Display current state label next to the switch
+        # Display current state label
         self.current_state_label = ctk.CTkLabel(motor_frame, text="IDLE", font=("Arial", 14))
-        self.current_state_label.grid(row=1, column=1, padx=(0,100), pady=5, sticky="w")
+        self.current_state_label.grid(row=1, column=2, padx=10, pady=0)
 
-        # Controller & Odrive Node Start Button Frame (Right Side)
-        motor_frame1 = ctk.CTkFrame(main_container_frame, corner_radius=15)
-        motor_frame1.grid(row=0, column=1, padx=(10, 10), pady=10, sticky="e")
+        # Encoder Offset Calibration Button
+        self.calibration_btn = ctk.CTkButton(motor_frame, text="ENCODER_OFFSET_CALIBRATION", corner_radius=10, 
+                                             command=self.encoder_offset_calibration)
+        self.calibration_btn.grid(row=1, column=4, padx=60, pady=5)
 
-        self.odrive_node_active = False
-        self.controller_active = False
-        self.odrive_node_btn = ctk.CTkButton(motor_frame1, text="Start Odrive Node", corner_radius=10, command=self.toggle_odrive_node)
-        self.odrive_node_btn.grid(row=0, column=0, padx=10, pady=5, sticky="ew")
+    def encoder_offset_calibration(self):
+        message = "ENCODER_OFFSET_CALIBRATION"
 
-        self.controller_btn = ctk.CTkButton(motor_frame1, text="Start Controller", corner_radius=10, command=self.toggle_controller)
-        self.controller_btn.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
-
-
-    def toggle_odrive_node(self):
-        self.odrive_node_active = not self.odrive_node_active
-        command = "Start Odrive Node" if self.odrive_node_active else "Stop Odrive Node"
-        self.odrive_node_btn.configure(text=command)
-        self.send_tcp_message(command)
-
-    def toggle_controller(self):
-        self.controller_active = not self.controller_active
-        command = "Start Controller" if self.controller_active else "Stop Controller"
-        self.controller_btn.configure(text=command)
-        self.send_tcp_message(command)
-
-    def send_tcp_message(self, message):
         try:
             if hasattr(self, 'client_socket') and self.client_socket:
                 self.client_socket.sendall(message.encode('utf-8'))
@@ -135,23 +88,21 @@ class ModernApp(ctk.CTk):
         except Exception as e:
             print(f"Error sending command: {e}")
 
-
     def toggle_motor_state(self):
         # Update the state label based on the toggle switch state
         current_state = self.motor_state_switch.get()
         self.current_state_label.configure(text=current_state)
-        print(current_state)
-        
-        # Send motor state over TCP
+        # print(current_state)
+        message = f"{current_state}"
+
         try:
             if hasattr(self, 'client_socket') and self.client_socket:
-                self.client_socket.sendall(current_state.encode('utf-8'))
-                print(f"Sent motor state command: {current_state}")
+                self.client_socket.sendall(message.encode('utf-8'))
+                print(f"Sent command: {message}")
             else:
                 print("No active connection. Please connect to the server first.")
         except Exception as e:
-            print(f"Error sending motor state command: {e}")
-
+            print(f"Error sending command: {e}")
 
     def connect(self):
         ip_address = self.ip_entry.get()
@@ -185,50 +136,6 @@ class ModernApp(ctk.CTk):
             if hasattr(self, 'client_socket') and self.client_socket:
                 self.client_socket.sendall(message.encode('utf-8'))
                 print(f"Sent command: {message}")
-            else:
-                print("No active connection. Please connect to the server first.")
-        except Exception as e:
-            print(f"Error sending command: {e}")
-
-    def toggle_recording(self):
-        if not self.is_recording:
-            # Start recording
-            self.is_recording = True
-            self.start_recording()
-            self.start_recording_btn.configure(text="Stop")
-        else:
-            # Stop recording
-            self.is_recording = False
-            self.stop_recording()
-            self.start_recording_btn.configure(text="Start")
-
-    def start_recording(self):
-        topic_name = self.topic_entry.get()
-        topic_name_1 = self.topic_entry1.get()
-        file_name = self.file_entry.get()
-
-        # Create the message based on the available topic names
-        message = f"{self.is_recording},{topic_name}"
-        if topic_name_1:
-            message += f",{topic_name_1}"
-        message += f",{file_name}"
-
-        try:
-            if hasattr(self, 'client_socket') and self.client_socket:
-                self.client_socket.sendall(message.encode('utf-8'))
-                print(f"Recording started for Topic: {message}")
-            else:
-                print("No active connection. Please connect to the server first.")
-        except Exception as e:
-            print(f"Error sending command: {e}")
-
-    def stop_recording(self):
-        file_name = self.file_entry.get()
-        message = f"{self.is_recording},{file_name}"
-        try:
-            if hasattr(self, 'client_socket') and self.client_socket:
-                self.client_socket.sendall(message.encode('utf-8'))
-                print("Recording stopped.")
             else:
                 print("No active connection. Please connect to the server first.")
         except Exception as e:
