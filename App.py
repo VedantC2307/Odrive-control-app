@@ -23,13 +23,13 @@ class ModernApp(ctk.CTk):
         self.ip_label.grid(row=0, column=0, padx=10, pady=5)
         self.ip_entry = ctk.CTkEntry(tcp_frame, corner_radius=10)
         self.ip_entry.grid(row=0, column=1, padx=10, pady=5)
-        self.ip_entry.insert(0, "localhost")
+        self.ip_entry.insert(0, "192.168.0.133")
 
         self.port_label = ctk.CTkLabel(tcp_frame, text="Port:")
         self.port_label.grid(row=0, column=2, padx=10, pady=5)
         self.port_entry = ctk.CTkEntry(tcp_frame, corner_radius=10)
         self.port_entry.grid(row=0, column=3, padx=10, pady=5)
-        self.port_entry.insert(0, "12345")
+        self.port_entry.insert(0, "1234")
 
         self.connect_btn = ctk.CTkButton(tcp_frame, text="Connect", corner_radius=10, hover_color="#357ABD", command=self.connect)
         self.connect_btn.grid(row=0, column=4, padx=10, pady=5)
@@ -95,11 +95,29 @@ class ModernApp(ctk.CTk):
         self.current_state_label = ctk.CTkLabel(motor_frame, text="IDLE", font=("Arial", 14))
         self.current_state_label.grid(row=1, column=2, padx=10, pady=0)
 
+    # def toggle_motor_state(self):
+    #     # Update the state label based on the toggle switch state
+    #     current_state = self.motor_state_switch.get()
+    #     self.current_state_label.configure(text=current_state)
+    #     print(current_state)
+
+
     def toggle_motor_state(self):
         # Update the state label based on the toggle switch state
         current_state = self.motor_state_switch.get()
         self.current_state_label.configure(text=current_state)
         print(current_state)
+        
+        # Send motor state over TCP
+        try:
+            if hasattr(self, 'client_socket') and self.client_socket:
+                self.client_socket.sendall(current_state.encode('utf-8'))
+                print(f"Sent motor state command: {current_state}")
+            else:
+                print("No active connection. Please connect to the server first.")
+        except Exception as e:
+            print(f"Error sending motor state command: {e}")
+
 
     def connect(self):
         ip_address = self.ip_entry.get()
