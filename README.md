@@ -36,15 +36,15 @@ Before you begin, ensure you have the following installed:
 
 *   **Python 3.7+:** Make sure you have Python 3.7 or a more recent version.
 *   **CustomTkinter:**  Install `customtkinter` with pip.
-*   **An ODrive Setup:** An ODrive motor controller and a server application running on the ODrive or a connected host which accepts TCP/IP messages.
+*   **An ODrive Setup:** An ODrive motor controller and a server application running on the ODrive or a connected host which accepts TCP/IP messages like Raspberry Pi.
 
 ### Installation
 
 1.  **Clone the repository:**
 
     ```bash
-    git clone <your_repo_url>
-    cd <your_repo_name>
+    git clone https://github.com/VedantC2307/Odrive-control-app.git 
+    cd Odrive-control-app
     ```
 
 2.  **Install the dependencies:**
@@ -57,7 +57,7 @@ Before you begin, ensure you have the following installed:
 1.  **Run the application:**
 
     ```bash
-    python main.py
+    python App.py
     ```
 
 2.  **Connect to your ODrive:**
@@ -92,7 +92,3 @@ The main.py implements this behaviour and takes the user input to perform this t
 
 ## Credits
 This project was built using Python and the customtkinter library.
-
-## Contact
-
-For any questions, issues, or collaboration ideas, please contact <your_email_or_github_username>.
